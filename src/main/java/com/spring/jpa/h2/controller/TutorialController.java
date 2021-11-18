@@ -1,17 +1,17 @@
-package com.bezkoder.spring.jpa.h2.controller;
+package com.spring.jpa.h2.controller;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.spring.jpa.h2.repository.TutorialRepository;
+import com.spring.jpa.h2.vo.TutorialVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.bezkoder.spring.jpa.h2.model.Tutorial;
-import com.bezkoder.spring.jpa.h2.repository.TutorialRepository;
+import com.spring.jpa.h2.model.Tutorial;
 
 @RestController
 @RequestMapping(path = "/api/tutorials")
@@ -19,12 +19,6 @@ public class TutorialController {
 
 	@Autowired
 	TutorialRepository tutorialRepository;
-
-	@RequestMapping("/")
-	@ResponseBody
-	public String hello() {
-		return "Hello World!";
-	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
@@ -58,10 +52,15 @@ public class TutorialController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
+	public ResponseEntity<Tutorial> createTutorial(@RequestBody TutorialVO tutorial) {
 		try {
 			Tutorial _tutorial = tutorialRepository
-					.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(), false));
+					.save( Tutorial
+							.builder()
+							.title(tutorial.getTitle())
+							.description(tutorial.getDescription())
+							.published(false)
+							.build());
 			return new ResponseEntity<>(_tutorial, HttpStatus.CREATED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
